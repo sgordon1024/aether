@@ -1,5 +1,7 @@
 # Aether
 
+![Aether — interactive generative art, in code](assets/banner.svg)
+
 An interactive, zero-install gallery of generative art sketches — built with
 [p5.js](https://p5js.org/). Twelve full-screen pieces spanning natural elements,
 emergent systems, and the cosmos. p5.js is vendored locally (`lib/p5.min.js`), so
