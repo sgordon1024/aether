@@ -31,9 +31,9 @@ let lastInteraction = 0;
 
 // ---- Hover-driven speed boost ----
 let hovering = false;
-let speedMult = 1.0;            // smoothed current speed multiplier
-const BASE_SPEED = 1.0;         // normal speed (like the original)
-const HOVER_SPEED = 6.0;        // "on acid" speed while hovering
+let speedMult = 0.25;           // smoothed current speed multiplier
+const BASE_SPEED = 0.25;        // resting speed — slow, meditative
+const HOVER_SPEED = 1.5;        // hover boost (still clearly faster, far gentler than before)
 let animPhase = 0;              // accumulated animation time (scaled by speedMult)
 
 // ---- Morph parameters (this is what makes it transform so much more) ----
