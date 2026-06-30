@@ -3,6 +3,18 @@
 // calls from setup() to clear the loading banner. Uncaught errors show ON THE
 // PAGE (no dev tools needed).
 (function () {
+  // Shared mobile/low-power detection, set BEFORE any sketch's setup() runs so
+  // every sketch can scale its workload via window.__isMobile.
+  window.__isMobile = (function () {
+    try {
+      const coarse = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+      const touch = (navigator.maxTouchPoints || 0) > 0;
+      const ua = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent || "");
+      const small = Math.min(window.screen.width || 9999, window.screen.height || 9999) < 820;
+      return ua || (coarse && touch) || small;
+    } catch (e) { return false; }
+  })();
+
   const GROUPS = [
     {
       label: "Elements",

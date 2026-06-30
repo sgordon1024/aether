@@ -37,7 +37,16 @@
 let nurseryShader;        // the volumetric raymarcher
 let gfx;                  // offscreen WEBGL buffer we render the shader into
 
-const RENDER_SCALE = 0.6; // internal render resolution multiplier (see notes)
+// Mobile gate: boot.js has already run and defined window.__isMobile.
+const MOBILE = !!(window.__isMobile);
+
+// Internal render resolution multiplier (see notes). Heaviest piece in the gallery,
+// so be aggressive on phones.
+const RENDER_SCALE = MOBILE ? 0.42 : 0.6;
+
+// GLSL loop-bound constants (injected into the shader template literal below).
+const MAX_STEPS_C    = MOBILE ? 34 : 56;
+const FBM_OCTAVES_C  = MOBILE ? 3  : 4;
 
 // ---- Camera orbit state (spherical coords around the origin) ----
 let yaw = 0.5;            // horizontal angle (radians)
@@ -80,7 +89,11 @@ void main() {
 
 // The volumetric stellar-nursery raymarcher.
 const FRAG = `
+#ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
+#else
+precision mediump float;
+#endif
 varying vec2 vUv;
 
 uniform vec2  uResolution;  // pixel size of the (low-res) render target
@@ -92,9 +105,9 @@ uniform float uShockR;      // current radius of the ignition shockwave (world u
 uniform float uFlash;       // 0..1 full-frame ignition flash (decays fast)
 
 // ---- Bounded loop constants (the WebGL1 compiler needs constant bounds) ----
-const int   MAX_STEPS    = 56;   // primary volume integration steps
+const int   MAX_STEPS    = ${MAX_STEPS_C};   // primary volume integration steps
 const int   SHADOW_STEPS = 4;    // short secondary march toward core (god-rays)
-const int   FBM_OCTAVES  = 4;    // fbm octaves
+const int   FBM_OCTAVES  = ${FBM_OCTAVES_C};    // fbm octaves
 const float CORE_R       = 0.10; // protostar core radius (world units)
 const float VOL_R        = 3.2;  // radius of the spherical gas volume
 

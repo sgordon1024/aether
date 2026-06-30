@@ -20,7 +20,9 @@ let bulbShader;   // the raymarch shader
 let blitShader;   // upscales the low-res render buffer to the full screen
 let lowFB;        // low-resolution framebuffer we raymarch into
 
-const RENDER_SCALE = 0.75; // internal render resolution multiplier (see notes above)
+const MOBILE = !!(window.__isMobile);
+
+const RENDER_SCALE = MOBILE ? 0.5 : 0.75; // internal render resolution multiplier (see notes above)
 
 // ---- Camera orbit state (spherical coords around the origin) ----
 let azimuth = 0.6;      // horizontal angle (radians)
@@ -53,8 +55,14 @@ void main() {
 `;
 
 // The Mandelbulb raymarcher.
+const STEPS = MOBILE ? 48 : 90;
+const ITERS_N = MOBILE ? 6 : 8;
 const FRAG = `
+#ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
+#else
+precision mediump float;
+#endif
 varying vec2 vUv;
 
 uniform vec2  uResolution; // pixel size of the (low-res) render target
@@ -64,8 +72,8 @@ uniform vec3  uCamTarget;  // point the camera looks at (origin)
 uniform float uPower;      // Mandelbulb power (breathes around 8.0)
 
 // Bounded loop constants so the WebGL1 compiler keeps the loops bounded.
-const int   MAX_STEPS = 90;
-const int   ITERS     = 8;
+const int   MAX_STEPS = ${STEPS};
+const int   ITERS     = ${ITERS_N};
 const float MAX_DIST  = 12.0;
 const float SURF_EPS  = 0.0006;
 
@@ -228,7 +236,11 @@ void main() {
 
 // A trivial blit shader: copies the low-res render buffer to the full screen.
 const BLIT_FRAG = `
+#ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
+#else
+precision mediump float;
+#endif
 varying vec2 vUv;
 uniform sampler2D uTex;
 void main() {

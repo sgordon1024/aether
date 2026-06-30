@@ -34,8 +34,9 @@ const KILL = 0.062;    // kill rate of B
 const DA   = 1.0;      // diffusion rate of A
 const DB   = 0.5;      // diffusion rate of B
 
-const SIM_STEPS = 12;  // simulation iterations per frame
-const SIM_CAP   = 900; // cap on the longest sim-grid side (perf)
+const MOBILE = !!(window.__isMobile);
+const SIM_STEPS = MOBILE ? 6 : 12;  // simulation iterations per frame
+const SIM_CAP   = MOBILE ? 480 : 900; // cap on the longest sim-grid side (perf)
 
 let SIMW, SIMH;        // actual sim grid dimensions (computed from window)
 
@@ -69,7 +70,11 @@ void main() {
 
 // Simulation step: reads A,B from R,G of uPrev; writes new A,B.
 const SIM_FRAG = `
+#ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
+#else
+precision mediump float;
+#endif
 varying vec2 vUv;
 
 uniform sampler2D uPrev;     // previous state (A in .r, B in .g)
@@ -140,7 +145,11 @@ void main() {
 
 // Colorize pass: map B through a lush palette with a little rim light.
 const RENDER_FRAG = `
+#ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
+#else
+precision mediump float;
+#endif
 varying vec2 vUv;
 
 uniform sampler2D uPrev;

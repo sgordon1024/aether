@@ -17,7 +17,13 @@ let bulbShader;
 let blitShader;
 let lowFB;
 
-const RENDER_SCALE = 0.75;
+const MOBILE = !!(window.__isMobile);
+
+const RENDER_SCALE = MOBILE ? 0.5 : 0.75;
+
+// GLSL loop-bound constants (cheaper on mobile).
+const MAX_STEPS = MOBILE ? 48 : 90;
+const ITERS = MOBILE ? 6 : 8;
 
 // ---- Camera orbit state ----
 let azimuth = 0.6;
@@ -60,7 +66,11 @@ void main() {
 `;
 
 const FRAG = `
+#ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
+#else
+precision mediump float;
+#endif
 varying vec2 vUv;
 
 uniform vec2  uResolution;
@@ -70,8 +80,8 @@ uniform vec3  uCamTarget;
 uniform float uPower;      // Mandelbulb power (swings wildly: 3 .. 11)
 uniform vec3  uMorph;      // animated offset added inside the iteration
 
-const int   MAX_STEPS = 90;
-const int   ITERS     = 8;
+const int   MAX_STEPS = ${MAX_STEPS};
+const int   ITERS     = ${ITERS};
 const float MAX_DIST  = 12.0;
 const float SURF_EPS  = 0.0006;
 
@@ -220,7 +230,11 @@ void main() {
 `;
 
 const BLIT_FRAG = `
+#ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
+#else
+precision mediump float;
+#endif
 varying vec2 vUv;
 uniform sampler2D uTex;
 void main() {

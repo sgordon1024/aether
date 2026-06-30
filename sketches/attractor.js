@@ -19,7 +19,8 @@
 // ============================================================================
 
 // ---- Tunables -------------------------------------------------------------
-const NUM_PARTICLES = 45000; // stated particle count
+const MOBILE = !!(window.__isMobile);
+const NUM_PARTICLES = MOBILE ? 14000 : 45000; // stated particle count
 const SUB_STEPS = 2;         // integration sub-steps per frame
 const DT = 0.012;            // base time step for the integrator
 const WORLD_SCALE = 150;     // scales attractor coords into screen-friendly units

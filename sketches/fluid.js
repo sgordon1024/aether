@@ -24,8 +24,13 @@
 //   universally supported in WebGL1, so we stay on RGBA8 for reliability.
 // ============================================================================
 
+// ---- Mobile detection (boot.js has already run) ----------------------------
+const MOBILE = !!(window.__isMobile);
+
 // ---- Simulation grid (fixed, square) --------------------------------------
-const SIM = 256;                 // sim resolution (SIM x SIM)
+// On mobile, roughly halve the sim resolution (256->128) to cut the dominant
+// per-frame fragment-shader fill cost by ~4x. Desktop stays at 256.
+const SIM = MOBILE ? 128 : 256;  // sim resolution (SIM x SIM)
 const DT  = 1.0;                 // sim timestep (in grid/texel units)
 
 // ---- Framebuffers (ping-pong) ----------------------------------------------
@@ -63,7 +68,11 @@ void main() {
 
 // --- helpers shared by SIM fragment shaders (pack/unpack signed velocity) ---
 const FRAG_HELPERS = `
+#ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
+#else
+precision mediump float;
+#endif
 varying vec2 vUv;
 uniform vec2  uTexel;       // 1/SIM in x and y
 // decode packed velocity (RG in [0,1]) back to signed vec2
@@ -197,7 +206,11 @@ void main() {
 // 5) RENDER — colorize dye to screen, tinted by velocity, with a soft tonemap.
 //    Has its own minimal header (does NOT use uTexel) so no uniform is stripped.
 const FRAG_RENDER = `
+#ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
+#else
+precision mediump float;
+#endif
 varying vec2 vUv;
 uniform sampler2D uDye;
 uniform sampler2D uVel;

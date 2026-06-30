@@ -21,9 +21,11 @@
 // ----------------------------------------------------------------------------
 // Tunables
 // ----------------------------------------------------------------------------
-const GRID_SCALE = 1.5;          // trail grid = canvas / GRID_SCALE
-const MAX_GRID_CELLS = 1300 * 820; // hard cap on grid pixels (perf guard)
-const TARGET_AGENTS = 18000;     // agent count (tuned for ~60fps Apple Silicon)
+const MOBILE = !!(window.__isMobile);
+
+const GRID_SCALE = MOBILE ? 2.4 : 1.5;          // trail grid = canvas / GRID_SCALE
+const MAX_GRID_CELLS = MOBILE ? 640 * 400 : 1300 * 820; // hard cap on grid pixels (perf guard)
+const TARGET_AGENTS = MOBILE ? 6000 : 18000;     // agent count (tuned for ~60fps Apple Silicon)
 
 const SENSE_ANGLE = 0.45;        // radians between center and side sensors
 let   senseDist = 9.0;           // pixels ahead the agent looks (mouse-wheel)
@@ -81,7 +83,7 @@ function buildSim() {
   // Scale agent count modestly with grid area so small windows stay lively
   // and huge windows do not melt the CPU.
   nAgents = Math.min(TARGET_AGENTS,
-                     Math.max(4000, Math.floor(cells * 0.07)));
+                     Math.max(MOBILE ? 2500 : 4000, Math.floor(cells * 0.07)));
 
   ax = new Float32Array(nAgents);
   ay = new Float32Array(nAgents);

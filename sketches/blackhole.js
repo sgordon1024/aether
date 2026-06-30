@@ -45,7 +45,9 @@
 
 let gfx;                 // offscreen WEBGL buffer we render the shader into
 let bhShader;            // the one big fragment shader
-const RENDER_SCALE = 0.85;
+const MOBILE = !!(window.__isMobile);
+const RENDER_SCALE = MOBILE ? 0.55 : 0.85;
+const LENS_STEPS = MOBILE ? 36 : 64;
 
 // --- interaction state (smoothed for buttery motion) ---
 let mass = 1.0;          // target mass multiplier (wheel)
@@ -73,7 +75,11 @@ void main() {
 
 // ============================= FRAGMENT SHADER ===============================
 const FRAG = `
+#ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
+#else
+precision mediump float;
+#endif
 
 varying vec2 vUv;
 
@@ -85,7 +91,7 @@ uniform float uSpin;         // 0..1 spin-up (disk speed + frame drag)
 uniform float uDiskAngle;    // accumulated disk rotation phase
 uniform float uTilt;         // disk tilt (radians) — near edge-on
 
-#define LENS_STEPS 64        // CONSTANT loop bound for the bending integrator
+#define LENS_STEPS ${LENS_STEPS}        // CONSTANT loop bound for the bending integrator
 #define PI 3.14159265359
 
 // ----------------------------------------------------------------------------

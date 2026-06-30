@@ -58,8 +58,15 @@ body.menu {
 @keyframes shift { 0%,100% { background-position: 0% 0%; } 50% { background-position: 100% 100%; } }
 
 /* ---------- piece pages ---------- */
-body.piece { margin: 0; background: #000; overflow: hidden; }
-body.piece canvas { display: block; }
+body.piece {
+  margin: 0; background: #000; overflow: hidden;
+  position: fixed; inset: 0; width: 100%; height: 100%;
+  overscroll-behavior: none;
+}
+/* The canvas owns all touch gestures (no page scroll/zoom/pull-to-refresh). */
+body.piece canvas { display: block; touch-action: none; }
+/* but the nav panel must still scroll on small screens */
+.nav-panel { touch-action: pan-y; -webkit-overflow-scrolling: touch; }
 
 .hint, .status {
   position: fixed; z-index: 9999;
