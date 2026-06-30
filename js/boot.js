@@ -21,7 +21,12 @@
         { id: "physarum",  emoji: "🍄", name: "Mycelium",   tag: "Emergence" },
         { id: "attractor", emoji: "✨", name: "Stardust",   tag: "Chaos" },
         { id: "fluid",     emoji: "💧", name: "Ink",        tag: "Fluid" },
-        { id: "fractal",   emoji: "🔮", name: "Mandelbulb", tag: "Fractal" },
+        { id: "fractal",   emoji: "🔮", name: "Mandelbulb", tag: "Fractal", sub: {
+          label: "Variations",
+          items: [
+            { id: "acidbulb", emoji: "🌈", name: "Acidbulb", tag: "Technicolor" },
+          ],
+        } },
         { id: "blackhole", emoji: "🕳️", name: "Event Horizon", tag: "Gravity" },
         { id: "genesis",   emoji: "🌟", name: "Genesis",       tag: "Volumetric" },
       ],
@@ -55,6 +60,21 @@
         '<span class="nav-emoji">' + pc.emoji + "</span>" +
         '<span class="nav-name">' + pc.name + "</span>" +
         '<span class="nav-tag">' + pc.tag + "</span></a>";
+
+      // Optional nested sub-folder (e.g. variations of a piece).
+      if (pc.sub) {
+        html += '<div class="nav-subfolder">';
+        html += '<div class="nav-sub-head">' + pc.sub.label + "</div>";
+        for (const sc of pc.sub.items) {
+          const sActive = sc.id === here ? " active" : "";
+          html +=
+            '<a class="nav-item nav-sub-item' + sActive + '" href="' + sc.id + '.html">' +
+            '<span class="nav-emoji">' + sc.emoji + "</span>" +
+            '<span class="nav-name">' + sc.name + "</span>" +
+            '<span class="nav-tag">' + sc.tag + "</span></a>";
+        }
+        html += "</div>";
+      }
     }
   }
   panel.innerHTML = html;

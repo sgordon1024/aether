@@ -115,6 +115,18 @@ body.nav-open .nav-panel { transform: translateX(0); }
 }
 .nav-item:hover { background: rgba(255,255,255,.07); }
 .nav-item.active { background: rgba(255,255,255,.12); }
+
+/* nested sub-folder (e.g. variations of a piece) */
+.nav-subfolder {
+  margin: 2px 0 4px 22px;
+  padding-left: 10px;
+  border-left: 1px solid rgba(255,255,255,.12);
+}
+.nav-sub-head {
+  font-size: .6rem; letter-spacing: .16em; text-transform: uppercase;
+  color: #6b7890; padding: 6px 8px 4px;
+}
+.nav-sub-item { padding: 9px 8px; }
 .nav-emoji { font-size: 1.15rem; }
 .nav-name { font-size: .98rem; }
 .nav-tag { font-size: .66rem; text-transform: uppercase; letter-spacing: .1em; color: #8fa1b3; }
