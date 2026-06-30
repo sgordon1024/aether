@@ -123,13 +123,40 @@
   if (document.body) mount();
   else window.addEventListener("DOMContentLoaded", mount);
 
-  window.__sketchReady = function () { status.style.display = "none"; };
+  let ready = false;
+  window.__sketchReady = function () { ready = true; status.style.display = "none"; };
 
-  window.addEventListener("error", function (e) {
+  function showErr(txt) {
     status.style.display = "block";
     status.classList.add("err");
-    const file = (e.filename || "").split("/").pop();
-    status.textContent =
-      "Error: " + (e.message || e.error) + "  (" + file + ":" + (e.lineno || "?") + ")";
+    status.textContent = txt;
+  }
+
+  window.addEventListener("error", function (e) {
+    // Ignore resource-load failures (a missing favicon, etc.) — not sketch errors.
+    if (e && e.target && e.target !== window && e.target.tagName) return;
+
+    const file = e && e.filename ? String(e.filename) : "";
+    const msg = (e && (e.message || (e.error && e.error.message))) || "";
+
+    // Opaque cross-origin "Script error." (no file/line) comes from a browser
+    // extension, an injected/managed-device script, or similar — NOT from this
+    // gallery. If the sketch already started fine, it's a false alarm: ignore it.
+    const opaque = !file && /script error/i.test(msg);
+    if (opaque && ready) return;
+
+    let txt = "Error: " + (msg || "unknown");
+    if (file) txt += "  (" + file.split("/").pop() + ":" + (e.lineno || "?") + ")";
+    else if (opaque) txt += "  (from an external/extension script, not the gallery)";
+    if (e && e.error && e.error.stack) {
+      txt += "\n" + String(e.error.stack).split("\n").slice(0, 3).join("\n");
+    }
+    showErr(txt);
+  });
+
+  window.addEventListener("unhandledrejection", function (e) {
+    if (ready) return;
+    const r = e && e.reason;
+    showErr("Promise error: " + ((r && r.message) || r || "unknown"));
   });
 })();
